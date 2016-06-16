@@ -1,20 +1,28 @@
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :edit, :update, :destroy]
+  before_filter :authorize
 
   # GET /posts
   def index
-    @posts = Post.order("id desc")
-    respond_to do |format|  
-      format.json { render json: @posts }
-    end
+    @posts = Post.where(user_id: current_user.id)
+                 .order("Posts.id desc")
+    render :json => @posts.to_json(
+        :include => [ 
+          :user 
+        ]
+    )
   end
 
   # GET /posts/1/comments
   def comments
     @comments = Comment.where(post_id: params[:id])
-    respond_to do |format|  
-      format.json { render json: @comments }
-    end
+                       .order("Comments.id desc")
+
+    render :json => @comments.to_json(
+        :include => [ 
+          :user 
+        ]
+    )
   end
 
   # GET /posts/1
@@ -52,10 +60,11 @@ class PostsController < ApplicationController
   # POST /posts
   def create
     @post = Post.new(post_params)
+    @post.user_id = current_user.id
 
     respond_to do |format|
       if @post.save
-        format.json { render :show, status: :created, location: @post }
+        format.json { render json: @post }
       else
         format.json { render json: @post.errors, status: :unprocessable_entity }
       end

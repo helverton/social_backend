@@ -19,11 +19,13 @@ ActiveRecord::Schema.define(version: 20160511235532) do
   create_table "comments", force: :cascade do |t|
     t.string   "texto"
     t.integer  "post_id"
+    t.integer  "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   add_index "comments", ["post_id"], name: "index_comments_on_post_id", using: :btree
+  add_index "comments", ["user_id"], name: "index_comments_on_user_id", using: :btree
 
   create_table "posts", force: :cascade do |t|
     t.string   "titulo"
@@ -45,5 +47,6 @@ ActiveRecord::Schema.define(version: 20160511235532) do
   end
 
   add_foreign_key "comments", "posts"
+  add_foreign_key "comments", "users"
   add_foreign_key "posts", "users"
 end
